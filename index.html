@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07151b" />
+  <title>PulseLens｜手機 PPG 測試</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div><span class="eyebrow">CAMERA rPPG LAB</span><h1>Pulse<span>Lens</span></h1></div>
+      <span id="privacy" class="pill">影像只在本機處理</span>
+    </header>
+
+    <section class="hero">
+      <div>
+        <p class="kicker">用手機鏡頭感受每一次脈搏</p>
+        <h2>將指腹輕覆後鏡頭<br />保持穩定，開始測量。</h2>
+        <p class="muted">系統分析指腹血流造成的亮度變化，估算即時心率。建議測量 30 秒。</p>
+      </div>
+      <div class="camera-card">
+        <video id="video" playsinline muted></video>
+        <div class="camera-placeholder" id="cameraPlaceholder"><span>◎</span><p>尚未啟用相機</p></div>
+        <div class="scanline"></div>
+        <span class="live" id="liveBadge">待機</span>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <article class="metric primary">
+        <span>即時心率</span>
+        <div><strong id="bpm">--</strong><small>BPM</small></div>
+        <p id="status">準備開始測量</p>
+      </article>
+      <article class="metric"><span>訊號品質</span><strong id="quality">--</strong><div class="meter"><i id="qualityBar"></i></div></article>
+      <article class="metric"><span>測量時間</span><strong id="timer">00:00</strong><small>建議至少 30 秒</small></article>
+    </section>
+
+    <section class="chart-card">
+      <div class="chart-head"><div><span>PPG 波形</span><small>即時光強度變化</small></div><span id="sampleRate">0 FPS</span></div>
+      <canvas id="chart"></canvas>
+    </section>
+
+    <section class="actions">
+      <button id="startBtn" class="primary-btn">啟用相機並開始</button>
+      <button id="stopBtn" disabled>停止測量</button>
+    </section>
+
+    <details>
+      <summary>正確測量方式與注意事項</summary>
+      <ol><li>使用後鏡頭，將食指指腹完整覆蓋鏡頭與閃光燈。</li><li>輕輕貼住即可，避免過度施壓造成血流減少。</li><li>手臂靠桌、保持靜止；若手機發熱請立即停止。</li><li>本工具僅供測試與研究，不可用於診斷或取代醫療器材。</li></ol>
+    </details>
+    <footer>PulseLens prototype · 非醫療器材</footer>
+  </main>
+  <canvas id="sampler" hidden></canvas>
+  <script src="app.js"></script>
+</body>
+</html>
