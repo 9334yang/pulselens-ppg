@@ -7,6 +7,7 @@
   <title>PulseLens｜手機 PPG 測試</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="progress.css" />
 </head>
 <body>
   <main class="shell">
@@ -19,7 +20,7 @@
       <div>
         <p class="kicker">用手機鏡頭感受每一次脈搏</p>
         <h2>將指腹輕覆後鏡頭<br />保持穩定，開始測量。</h2>
-        <p class="muted">系統分析指腹血流造成的亮度變化，估算即時心率。建議測量 30 秒。</p>
+        <p class="muted">系統會引導你完成固定 30 秒測量，進度結束後自動停止並顯示結果。</p>
       </div>
       <div class="camera-card">
         <video id="video" playsinline muted></video>
@@ -36,7 +37,12 @@
         <p id="status">準備開始測量</p>
       </article>
       <article class="metric"><span>訊號品質</span><strong id="quality">--</strong><div class="meter"><i id="qualityBar"></i></div></article>
-      <article class="metric"><span>測量時間</span><strong id="timer">00:00</strong><small>建議至少 30 秒</small></article>
+      <article class="metric goal-metric">
+        <span>測量目標</span>
+        <div class="goal-ring" id="goalRing" style="--progress:0deg">
+          <div><strong id="timer">00:30</strong><small id="phase">尚未開始</small></div>
+        </div>
+      </article>
     </section>
 
     <section class="chart-card">
@@ -45,8 +51,8 @@
     </section>
 
     <section class="actions">
-      <button id="startBtn" class="primary-btn">啟用相機並開始</button>
-      <button id="stopBtn" disabled>停止測量</button>
+      <button id="startBtn" class="primary-btn">開始 30 秒測量</button>
+      <button id="stopBtn" disabled>取消測量</button>
     </section>
 
     <details>

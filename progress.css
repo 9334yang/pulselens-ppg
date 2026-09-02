@@ -1,0 +1,8 @@
+.goal-metric{display:flex;flex-direction:column}
+.goal-ring{--progress:0deg;width:116px;height:116px;margin:8px auto 0;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--mint) var(--progress),#17343d 0);position:relative;transition:background .2s linear}
+.goal-ring:before{content:"";position:absolute;inset:8px;border-radius:50%;background:#091c23}
+.goal-ring>div{position:relative;text-align:center}
+.goal-ring strong{font-size:25px;line-height:1;margin:0;font-variant-numeric:tabular-nums}
+.goal-ring small{font-size:11px;margin-top:4px}
+.goal-ring.complete{background:var(--mint);box-shadow:0 0 24px #5ef2bc55}
+.goal-ring.complete small{color:var(--mint)}
