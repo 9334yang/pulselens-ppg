@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07151b" />
+  <title>測量紀錄｜PulseLens</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="progress.css" />
+</head>
+<body>
+  <main class="shell history-page">
+    <header><div><span class="eyebrow">CAMERA rPPG LAB</span><h1>Pulse<span>Lens</span></h1></div><a class="back-link" href="index.html">← 返回測量</a></header>
+    <section class="history-page-intro"><span class="kicker">DEVICE HISTORY</span><h1>測量紀錄</h1><p>查看這台裝置最近完成的 30 筆有效測量。</p></section>
+    <section class="history-card" aria-labelledby="historyTitle">
+      <div class="history-heading"><div><span>RECENT RESULTS</span><h2 id="historyTitle">以往資訊</h2></div><button id="clearHistory" type="button" hidden>清除全部</button></div>
+      <p class="history-privacy">紀錄只保存在這台裝置的瀏覽器，不會上傳。</p>
+      <div id="historyList" class="history-list"></div>
+      <p id="historyEmpty" class="history-empty">目前沒有紀錄。完成第一次有效測量後，資料會顯示在這裡。</p>
+    </section>
+    <footer>PulseLens prototype · 非醫療器材</footer>
+  </main>
+  <script src="history.js"></script>
+</body>
+</html>

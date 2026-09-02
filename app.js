@@ -6,17 +6,7 @@ const HISTORY_KEY='pulselens-history-v1',MAX_HISTORY=30;
 
 function setStatus(text){$('#status').textContent=text}
 function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]')}catch{return[]}}
-function saveRecord(record){try{localStorage.setItem(HISTORY_KEY,JSON.stringify([record,...getHistory()].slice(0,MAX_HISTORY)));renderHistory()}catch{}}
-function renderHistory(){
-  const records=getHistory();$('#historyEmpty').hidden=records.length>0;$('#clearHistory').hidden=records.length===0;
-  $('#historyList').replaceChildren(...records.map(record=>{
-    const item=document.createElement('article');item.className='history-item';
-    const date=document.createElement('time');date.dateTime=record.at;date.textContent=new Intl.DateTimeFormat('zh-TW',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(record.at));
-    const pulse=document.createElement('div');pulse.innerHTML=`<span>脈搏</span><strong>${Number(record.pulse)}</strong><small>BPM</small>`;
-    const rhythm=document.createElement('div');rhythm.innerHTML=`<span>心律</span><strong>${record.rhythm}</strong><small>品質 ${Number(record.quality)}%</small>`;
-    item.append(date,pulse,rhythm);return item;
-  }));
-}
+function saveRecord(record){try{localStorage.setItem(HISTORY_KEY,JSON.stringify([record,...getHistory()].slice(0,MAX_HISTORY)))}catch{}}
 function resizeChart(){const d=devicePixelRatio||1;chart.width=chart.clientWidth*d;chart.height=chart.clientHeight*d;plot.setTransform(d,0,0,d,0,0)}
 addEventListener('resize',resizeChart);resizeChart();
 
@@ -88,7 +78,5 @@ $('#dismissInstructions').addEventListener('click',()=>instructionDialog.close()
 $('#confirmInstructions').addEventListener('click',()=>{instructionDialog.close();start()});
 $('#dismissQuality').addEventListener('click',()=>$('#qualityDialog').close());
 $('#retryMeasurement').addEventListener('click',()=>{$('#qualityDialog').close();start()});
-$('#clearHistory').addEventListener('click',()=>{if(confirm('確定要清除這台裝置上的全部測量紀錄嗎？')){localStorage.removeItem(HISTORY_KEY);renderHistory()}});
 $('#stopBtn').addEventListener('click',stop);addEventListener('pagehide',releaseCamera);
-renderHistory();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
