@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s),video=$('#video'),sampler=$('#sampler'),chart=$('#chart');
 const ctx=sampler.getContext('2d',{willReadFrequently:true}),plot=chart.getContext('2d');
-let stream=null,running=false,raf=0,startAt=0,lastSample=0,samples=[],times=[],lastBeat=0,bpmHistory=[],lastBpmRecord=0;
+let stream=null,running=false,raf=0,startAt=0,lastSample=0,samples=[],times=[],lastBeat=0,bpmHistory=[],lastBpmRecord=0,badSignalTotal=0,badSignalStreak=0,lastSignalCheck=0;
 const MAX_SECONDS=15,MEASUREMENT_SECONDS=30;
 
 function setStatus(text){$('#status').textContent=text}
@@ -13,15 +13,16 @@ async function start(){
     video.srcObject=stream;await video.play();
     const track=stream.getVideoTracks()[0],caps=track.getCapabilities?.()||{};
     if(caps.torch){try{await track.applyConstraints({advanced:[{torch:true}]})}catch{}}
-    sampler.width=64;sampler.height=48;samples=[];times=[];lastBeat=0;bpmHistory=[];lastBpmRecord=0;running=true;startAt=performance.now();lastSample=0;
+    sampler.width=64;sampler.height=48;samples=[];times=[];lastBeat=0;bpmHistory=[];lastBpmRecord=0;badSignalTotal=0;badSignalStreak=0;lastSignalCheck=performance.now();running=true;startAt=performance.now();lastSample=0;
     $('#cameraPlaceholder').hidden=true;$('.camera-card').classList.add('measuring');$('#liveBadge').textContent='測量中';
     $('#startBtn').disabled=true;$('#stopBtn').disabled=false;$('#bpm').textContent='--';$('#quality').textContent='--';$('#qualityBar').style.width='0';
-    $('#goalRing').classList.remove('complete');$('#goalRing').style.setProperty('--progress','0deg');$('#timer').textContent='00:30';$('#phase').textContent='準備訊號';$('#resultCard').hidden=true;
+    $('#goalRing').classList.remove('complete','failed');$('#goalRing').style.setProperty('--progress','0deg');$('#timer').textContent='00:30';$('#phase').textContent='準備訊號';$('#resultCard').hidden=true;
     setStatus('請將指腹覆蓋鏡頭並保持穩定');loop();
   }catch(e){setStatus(e.name==='NotAllowedError'?'相機權限遭拒，請在瀏覽器設定中允許':'無法啟用相機：'+e.message)}
 }
 function releaseCamera(){running=false;cancelAnimationFrame(raf);stream?.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;$('.camera-card').classList.remove('measuring');$('#cameraPlaceholder').hidden=false;$('#startBtn').disabled=false;$('#stopBtn').disabled=true}
 function stop(){releaseCamera();$('#liveBadge').textContent='已取消';$('#timer').textContent='00:30';$('#phase').textContent='尚未開始';$('#goalRing').style.setProperty('--progress','0deg');setStatus('測量已取消，按下按鈕可重新開始')}
+function failQuality(){releaseCamera();$('#liveBadge').textContent='訊號不良';$('#phase').textContent='請重新測量';$('#goalRing').classList.add('failed');$('#resultCard').hidden=true;setStatus('訊號中斷過久，請調整後重新測量');$('#qualityDialog').showModal()}
 function complete(){
   releaseCamera();$('#liveBadge').textContent='完成';$('#timer').textContent='完成';$('#phase').textContent='測量完成';$('#goalRing').style.setProperty('--progress','360deg');$('#goalRing').classList.add('complete');$('#startBtn').textContent='重新測量';
   const values=bpmHistory.map(x=>x.bpm).sort((a,b)=>a-b),pulse=values.length?values[Math.floor(values.length/2)]:0;
@@ -41,10 +42,14 @@ function loop(now=performance.now()){
   $('#goalRing').style.setProperty('--progress',`${Math.min(360,t/MEASUREMENT_SECONDS*360)}deg`);$('#phase').textContent=t<6?'建立訊號':'保持穩定';
   const fps=times.length>1?(times.length-1)/(times.at(-1)-times[0]):0;$('#sampleRate').textContent=`${fps.toFixed(0)} FPS`;
   const covered=red/n>80&&red/n>green/n*1.15;
+  let signalUsable=covered;
   if(!covered){$('#quality').textContent='請覆蓋';$('#qualityBar').style.width='8%';setStatus('請用指腹完整覆蓋鏡頭與閃光燈');$('#bpm').textContent='--'}
   else if(times.at(-1)<6){$('#quality').textContent='建立中';$('#qualityBar').style.width=`${20+times.at(-1)*8}%`;setStatus('正在建立穩定訊號…')}
-  else analyze(fps);
+  else signalUsable=analyze(fps)>=30;
+  const signalDelta=Math.min(.2,(now-lastSignalCheck)/1000);lastSignalCheck=now;
+  if(t>4&&!signalUsable){badSignalTotal+=signalDelta;badSignalStreak+=signalDelta}else if(signalUsable)badSignalStreak=0;
   draw();
+  if(badSignalStreak>=3||badSignalTotal>=6){failQuality();return}
   if(t>=MEASUREMENT_SECONDS)complete();
 }
 
@@ -55,6 +60,7 @@ function analyze(fs){
   const bpm=bestLag?Math.round(60*fs/bestLag):0,quality=Math.max(0,Math.min(100,Math.round((best-.15)*130)));
   $('#quality').textContent=quality>70?'良好':quality>40?'普通':'不穩定';$('#qualityBar').style.width=quality+'%';
   if(best>.35&&bpm>=45&&bpm<=180){$('#bpm').textContent=bpm;setStatus(quality>60?'訊號穩定，繼續保持':'請減少手部移動');lastBeat=bpm;if(performance.now()-lastBpmRecord>=900){bpmHistory.push({bpm,quality});lastBpmRecord=performance.now()}}else{$('#bpm').textContent=lastBeat||'--';setStatus('訊號較弱，請調整指腹位置')}
+  return quality;
 }
 function draw(){
   const w=chart.clientWidth,h=chart.clientHeight;plot.clearRect(0,0,w,h);plot.strokeStyle='#173945';plot.lineWidth=1;
@@ -66,5 +72,7 @@ const instructionDialog=$('#instructionDialog');
 $('#startBtn').addEventListener('click',()=>instructionDialog.showModal());
 $('#dismissInstructions').addEventListener('click',()=>instructionDialog.close());
 $('#confirmInstructions').addEventListener('click',()=>{instructionDialog.close();start()});
+$('#dismissQuality').addEventListener('click',()=>$('#qualityDialog').close());
+$('#retryMeasurement').addEventListener('click',()=>{$('#qualityDialog').close();start()});
 $('#stopBtn').addEventListener('click',stop);addEventListener('pagehide',releaseCamera);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});

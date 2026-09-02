@@ -83,6 +83,21 @@
       <button id="confirmInstructions" class="primary-btn" type="button">我知道了，開始測量</button>
     </div>
   </dialog>
+  <dialog id="qualityDialog" aria-labelledby="qualityTitle">
+    <div class="notice-icon warning-icon">!</div>
+    <span class="notice-label warning-label">測量已自動停止</span>
+    <h2 id="qualityTitle">訊號不穩定，請重新測量</h2>
+    <p class="quality-message">系統無法取得足夠的有效脈搏訊號，因此不會產生本次結果。</p>
+    <ul class="quality-tips">
+      <li>確認指腹完整覆蓋鏡頭與閃光燈</li>
+      <li>減輕按壓力道，手臂靠桌保持靜止</li>
+      <li>擦拭鏡頭，並取下可能遮住閃光燈的手機殼</li>
+    </ul>
+    <div class="dialog-actions">
+      <button id="dismissQuality" type="button">稍後再測</button>
+      <button id="retryMeasurement" class="primary-btn" type="button">重新開始測量</button>
+    </div>
+  </dialog>
   <canvas id="sampler" hidden></canvas>
   <script src="app.js"></script>
 </body>
