@@ -55,5 +55,9 @@ function draw(){
   if(samples.length<2)return;const recent=samples.slice(-300),mean=recent.reduce((a,b)=>a+b,0)/recent.length,dev=Math.sqrt(recent.reduce((a,v)=>a+(v-mean)**2,0)/recent.length)||1;
   plot.beginPath();plot.strokeStyle='#5ef2bc';plot.lineWidth=2;recent.forEach((v,i)=>{const x=i/(recent.length-1)*w,y=h/2-(v-mean)/(dev*4)*h;(i?plot.lineTo(x,y):plot.moveTo(x,y))});plot.stroke();
 }
-$('#startBtn').addEventListener('click',start);$('#stopBtn').addEventListener('click',stop);addEventListener('pagehide',releaseCamera);
+const instructionDialog=$('#instructionDialog');
+$('#startBtn').addEventListener('click',()=>instructionDialog.showModal());
+$('#dismissInstructions').addEventListener('click',()=>instructionDialog.close());
+$('#confirmInstructions').addEventListener('click',()=>{instructionDialog.close();start()});
+$('#stopBtn').addEventListener('click',stop);addEventListener('pagehide',releaseCamera);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});

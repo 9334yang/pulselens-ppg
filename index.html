@@ -55,12 +55,24 @@
       <button id="stopBtn" disabled>取消測量</button>
     </section>
 
-    <details>
-      <summary>正確測量方式與注意事項</summary>
-      <ol><li>使用後鏡頭，將食指指腹完整覆蓋鏡頭與閃光燈。</li><li>輕輕貼住即可，避免過度施壓造成血流減少。</li><li>手臂靠桌、保持靜止；若手機發熱請立即停止。</li><li>本工具僅供測試與研究，不可用於診斷或取代醫療器材。</li></ol>
-    </details>
     <footer>PulseLens prototype · 非醫療器材</footer>
   </main>
+  <dialog id="instructionDialog" aria-labelledby="instructionTitle">
+    <div class="notice-icon">◎</div>
+    <span class="notice-label">開始前請先閱讀</span>
+    <h2 id="instructionTitle">正確測量方式與注意事項</h2>
+    <ol class="instruction-list">
+      <li><strong>完整覆蓋</strong><span>使用後鏡頭，將食指指腹完整覆蓋鏡頭與閃光燈。</span></li>
+      <li><strong>輕輕貼住</strong><span>避免過度施壓，否則可能造成指尖血流減少。</span></li>
+      <li><strong>保持穩定</strong><span>手臂靠桌並保持不動，直到 30 秒進度完成。</span></li>
+      <li><strong>注意溫度</strong><span>若手機或手指感到過熱，請立即取消測量。</span></li>
+    </ol>
+    <p class="medical-note">本工具僅供測試與研究，不可用於診斷或取代醫療器材。</p>
+    <div class="dialog-actions">
+      <button id="dismissInstructions" type="button">稍後再測</button>
+      <button id="confirmInstructions" class="primary-btn" type="button">我知道了，開始測量</button>
+    </div>
+  </dialog>
   <canvas id="sampler" hidden></canvas>
   <script src="app.js"></script>
 </body>
