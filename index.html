@@ -65,6 +65,16 @@
       <p class="result-disclaimer">心律結果僅反映本次相機 PPG 的脈搏規律度，不等同心電圖，也不能診斷心律不整。</p>
     </section>
 
+    <section class="history-card" aria-labelledby="historyTitle">
+      <div class="history-heading">
+        <div><span>DEVICE HISTORY</span><h2 id="historyTitle">測量紀錄</h2></div>
+        <button id="clearHistory" type="button" hidden>清除全部</button>
+      </div>
+      <p class="history-privacy">紀錄只保存在這台裝置的瀏覽器，不會上傳。</p>
+      <div id="historyList" class="history-list"></div>
+      <p id="historyEmpty" class="history-empty">完成第一次有效測量後，紀錄會顯示在這裡。</p>
+    </section>
+
     <footer>PulseLens prototype · 非醫療器材</footer>
   </main>
   <dialog id="instructionDialog" aria-labelledby="instructionTitle">

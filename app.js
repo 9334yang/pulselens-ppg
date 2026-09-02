@@ -2,8 +2,21 @@ const $=s=>document.querySelector(s),video=$('#video'),sampler=$('#sampler'),cha
 const ctx=sampler.getContext('2d',{willReadFrequently:true}),plot=chart.getContext('2d');
 let stream=null,running=false,raf=0,startAt=0,lastSample=0,samples=[],times=[],lastBeat=0,bpmHistory=[],lastBpmRecord=0,badSignalTotal=0,badSignalStreak=0,lastSignalCheck=0;
 const MAX_SECONDS=15,MEASUREMENT_SECONDS=30;
+const HISTORY_KEY='pulselens-history-v1',MAX_HISTORY=30;
 
 function setStatus(text){$('#status').textContent=text}
+function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]')}catch{return[]}}
+function saveRecord(record){try{localStorage.setItem(HISTORY_KEY,JSON.stringify([record,...getHistory()].slice(0,MAX_HISTORY)));renderHistory()}catch{}}
+function renderHistory(){
+  const records=getHistory();$('#historyEmpty').hidden=records.length>0;$('#clearHistory').hidden=records.length===0;
+  $('#historyList').replaceChildren(...records.map(record=>{
+    const item=document.createElement('article');item.className='history-item';
+    const date=document.createElement('time');date.dateTime=record.at;date.textContent=new Intl.DateTimeFormat('zh-TW',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(record.at));
+    const pulse=document.createElement('div');pulse.innerHTML=`<span>脈搏</span><strong>${Number(record.pulse)}</strong><small>BPM</small>`;
+    const rhythm=document.createElement('div');rhythm.innerHTML=`<span>心律</span><strong>${record.rhythm}</strong><small>品質 ${Number(record.quality)}%</small>`;
+    item.append(date,pulse,rhythm);return item;
+  }));
+}
 function resizeChart(){const d=devicePixelRatio||1;chart.width=chart.clientWidth*d;chart.height=chart.clientHeight*d;plot.setTransform(d,0,0,d,0,0)}
 addEventListener('resize',resizeChart);resizeChart();
 
@@ -29,6 +42,7 @@ function complete(){
   const mean=values.reduce((a,b)=>a+b,0)/(values.length||1),variation=mean?Math.sqrt(values.reduce((a,v)=>a+(v-mean)**2,0)/(values.length||1))/mean:1;
   const enough=values.length>=8,rhythm=!enough?'訊號不足':variation<=.06?'規律':'波動較大';
   $('#resultPulse').textContent=pulse||'--';$('#resultRhythm').textContent=rhythm;$('#rhythmNote').textContent=!enough?'有效訊號時間不足':variation<=.06?'本次脈搏間隔穩定':'建議靜止後重新測量';$('#resultCard').hidden=false;
+  if(pulse&&enough){const averageQuality=Math.round(bpmHistory.reduce((sum,x)=>sum+x.quality,0)/bpmHistory.length);saveRecord({at:new Date().toISOString(),pulse,rhythm,quality:averageQuality})}
   setStatus(pulse?'測量完成，結果已產生':'測量完成，但訊號不足，建議重新測量');$('#resultCard').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
@@ -74,5 +88,7 @@ $('#dismissInstructions').addEventListener('click',()=>instructionDialog.close()
 $('#confirmInstructions').addEventListener('click',()=>{instructionDialog.close();start()});
 $('#dismissQuality').addEventListener('click',()=>$('#qualityDialog').close());
 $('#retryMeasurement').addEventListener('click',()=>{$('#qualityDialog').close();start()});
+$('#clearHistory').addEventListener('click',()=>{if(confirm('確定要清除這台裝置上的全部測量紀錄嗎？')){localStorage.removeItem(HISTORY_KEY);renderHistory()}});
 $('#stopBtn').addEventListener('click',stop);addEventListener('pagehide',releaseCamera);
+renderHistory();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
