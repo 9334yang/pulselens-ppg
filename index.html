@@ -17,16 +17,22 @@
     </header>
 
     <section class="hero">
-      <div>
+      <div class="hero-copy">
         <p class="kicker">用手機鏡頭感受每一次脈搏</p>
         <h2>將指腹輕覆後鏡頭<br />保持穩定，開始測量。</h2>
         <p class="muted">系統會引導你完成固定 30 秒測量，進度結束後自動停止並顯示結果。</p>
       </div>
-      <div class="camera-card">
-        <video id="video" playsinline muted></video>
-        <div class="camera-placeholder" id="cameraPlaceholder"><span>◎</span><p>尚未啟用相機</p></div>
-        <div class="scanline"></div>
-        <span class="live" id="liveBadge">待機</span>
+      <div class="camera-panel">
+        <div class="camera-card">
+          <video id="video" playsinline muted></video>
+          <div class="camera-placeholder" id="cameraPlaceholder"><span>◎</span><p>尚未啟用相機</p></div>
+          <div class="scanline"></div>
+          <span class="live" id="liveBadge">待機</span>
+        </div>
+        <section class="actions camera-actions">
+          <button id="startBtn" class="primary-btn">開始 30 秒測量</button>
+          <button id="stopBtn" disabled>取消測量</button>
+        </section>
       </div>
     </section>
 
@@ -48,11 +54,6 @@
     <section class="chart-card">
       <div class="chart-head"><div><span>PPG 波形</span><small>即時光強度變化</small></div><span id="sampleRate">0 FPS</span></div>
       <canvas id="chart"></canvas>
-    </section>
-
-    <section class="actions">
-      <button id="startBtn" class="primary-btn">開始 30 秒測量</button>
-      <button id="stopBtn" disabled>取消測量</button>
     </section>
 
     <section class="result-card" id="resultCard" hidden aria-live="polite">
