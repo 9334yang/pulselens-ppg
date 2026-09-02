@@ -55,6 +55,15 @@
       <button id="stopBtn" disabled>取消測量</button>
     </section>
 
+    <section class="result-card" id="resultCard" hidden aria-live="polite">
+      <div class="result-heading"><div><span>MEASUREMENT COMPLETE</span><h2>本次測量結果</h2></div><span class="result-check">✓</span></div>
+      <div class="result-grid">
+        <article><span>脈搏</span><div><strong id="resultPulse">--</strong><small>BPM</small></div><p>30 秒穩定讀值</p></article>
+        <article><span>心律</span><strong id="resultRhythm">--</strong><p id="rhythmNote">PPG 短期規律度</p></article>
+      </div>
+      <p class="result-disclaimer">心律結果僅反映本次相機 PPG 的脈搏規律度，不等同心電圖，也不能診斷心律不整。</p>
+    </section>
+
     <footer>PulseLens prototype · 非醫療器材</footer>
   </main>
   <dialog id="instructionDialog" aria-labelledby="instructionTitle">
